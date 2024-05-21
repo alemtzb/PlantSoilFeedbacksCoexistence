@@ -4,7 +4,7 @@ library(ggplot2)
 library(gtools)
 #library(plyr)
 library(mgcv)
-load("~/Dropbox/ESRP en campo 2018/segundo artículo/betas supervivencia.Rdata")
+load("~/betas supervivencia.Rdata")
 #this will load the required data from Martorell et al. 2021
 
 # prepare data 

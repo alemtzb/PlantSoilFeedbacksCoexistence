@@ -4,10 +4,13 @@ library(ggplot2)
 library(gtools)
 #library(plyr)
 library(mgcv)
-load("~/betas supervivencia.Rdata")
+#load("~/betas supervivencia.Rdat")
+setwd("~/Desktop/GitHub/PlantSoilFeedbacksCoexistence")
+load("betas supervivencia.Rdat")
+load("parametros.Rdata")
 #this will load the required data from Martorell et al. 2021
 
-# prepare data 
+# prepare data
 b0p=rowMeans(b0)
 for(i in 1:17) b0[,i]=b0p
 
@@ -55,7 +58,7 @@ equaliz=function(prof,b1=bersp,b2=binter,ww=matw,spid=1:17){
 
 
 
-# estimate stabilizing and equalizing effects for all pairs or species in spid and for 
+# estimate stabilizing and equalizing effects for all pairs or species in spid and for
 # all soil depths in vector "profs". Returns list of two arrays with stabilizing "ss" and
 # equalizing "ee" effects.
 
@@ -109,11 +112,11 @@ colu=colorRampPalette(list("orange","black"))(29)
 
 par(mfrow=c(3,1))
 #plot stabilization
-xx8=sqrttrans(c(as.matrix(psf8)))
+xx8=sqrttrans(c(as.matrix(psf8[-18,-18])))
 yy8=sqrttrans(c(as.matrix(ss8)))
-xx16=sqrttrans(c(as.matrix(psf16)))
+xx16=sqrttrans(c(as.matrix(psf16[-18,-18])))
 yy16=sqrttrans(c(as.matrix(ss16)))
-xx24=sqrttrans(c(as.matrix(psf24)))
+xx24=sqrttrans(c(as.matrix(psf24[-18,-18])))
 yy24=sqrttrans(c(as.matrix(ss24)))
 mod8=gam(yy8~s(xx8))
 xxx8=seq(min(xx8,na.rm=T),max(xx8,na.rm=T),length.out=25)
@@ -136,11 +139,11 @@ lines(xxx24,predict(mod24,data.frame(xx24=xxx24)),col=colu[24])
 
 
 #plot fitness differences
-xx8=sqrttrans(c(as.matrix(psf8)))
+xx8=sqrttrans(c(as.matrix(psf8[-18,-18])))
 yy8=abs(sqrttrans(c(as.matrix(ee8))))
-xx16=sqrttrans(c(as.matrix(psf16)))
+xx16=sqrttrans(c(as.matrix(psf16[-18,-18])))
 yy16=abs(sqrttrans(c(as.matrix(ee16))))
-xx24=sqrttrans(c(as.matrix(psf24)))
+xx24=sqrttrans(c(as.matrix(psf24[-18,-18])))
 yy24=abs(sqrttrans(c(as.matrix(ee24))))
 mod8=gam(yy8~s(xx8))
 xxx8=seq(min(xx8,na.rm=T),max(xx8,na.rm=T),length.out=25)
@@ -163,11 +166,11 @@ lines(xxx24,predict(mod24,data.frame(xx24=xxx24)),col=colu[24])
 
 
 #plot net effects
-xx8=sqrttrans(c(as.matrix(psf8)))
+xx8=sqrttrans(c(as.matrix(psf8[-18,-18])))
 yy8=sqrttrans(c(as.matrix(ss8-abs(ee8))))
-xx16=sqrttrans(c(as.matrix(psf16)))
+xx16=sqrttrans(c(as.matrix(psf16[-18,-18])))
 yy16=sqrttrans(c(as.matrix(ss16-abs(ee16))))
-xx24=sqrttrans(c(as.matrix(psf24)))
+xx24=sqrttrans(c(as.matrix(psf24[-18,-18])))
 yy24=sqrttrans(c(as.matrix(ss24-abs(ee24))))
 mod8=gam(yy8~s(xx8))
 xxx8=seq(min(xx8,na.rm=T),max(xx8,na.rm=T),length.out=25)
@@ -217,14 +220,14 @@ lines(xxx24,predict(mod24,data.frame(xx24=xxx24)),col=colu[24])
 	lines(profs,salss[3,],lty=1,lwd=2)
 	lines(profs,salss[4,],lty=1)
 	lines(profs,salss[5,],lty=2)
-	
+
 	plot(-1000,-1000,xlim=c(3,23),ylim=c(0,max(salee)),ylab="fitness difference")
 	lines(profs,salee[1,],lty=2)
 	lines(profs,salee[2,],lty=1)
 	lines(profs,salee[3,],lty=1,lwd=2)
 	lines(profs,salee[4,],lty=1)
 	lines(profs,salee[5,],lty=2)
-	
+
 	plot(-1000,-1000,xlim=c(3,23),ylim=c(min(saldd),max(saldd)),ylab="net effect")
 	lines(c(-100,100),c(0,0),col="gray")
 	lines(profs,saldd[1,],lty=2)
@@ -240,7 +243,7 @@ lines(xxx24,predict(mod24,data.frame(xx24=xxx24)),col=colu[24])
 # functions for multispecies analysis #
 #######################################
 
-# Calculate stability Ic and frequency of individuals per species 
+# Calculate stability Ic and frequency of individuals per species
 # (whose numbers are specified as a vector spid) in a given soil depth
 Ic=function(prof,b1=bersp,b2=binter,ww=matw,spid=1:17){
 	b1=b1[spid,spid]
@@ -261,7 +264,7 @@ Ic=function(prof,b1=bersp,b2=binter,ww=matw,spid=1:17){
 }
 
 
-#as Ic, but for several soil depths. 
+#as Ic, but for several soil depths.
 comprof=function(profs,b1=bersp,b2=binter,ww=matw,spid){
 	b1=b1[spid,spid]
 	b2=b2[spid,spid]
@@ -279,9 +282,9 @@ comprof=function(profs,b1=bersp,b2=binter,ww=matw,spid){
 	list("vIc"=vIc,"feas"=feas)
 }
 
-#Estimates Ic for all possible communities from those having just two species 
+#Estimates Ic for all possible communities from those having just two species
 #to that havinag all species. There are 131054 species so this takes a while.
-#For avery community this returns a vector "species" containing the species "especies" 
+#For avery community this returns a vector "species" containing the species "especies"
 #in the community, the "Ic" value, the frequency of all species in the stable community "feas"
 #and the pairwise stabilization and equalization metrics.
 
@@ -298,11 +301,11 @@ todascom=function(prof,b1=bersp,b2=binter,ww=matw){
 }
 
 
-###obtain statistics for all possible communities for all soil depths between 4 
+###obtain statistics for all possible communities for all soil depths between 4
 # and 28 cm.
 
-################IMPORTANT################ 
-#In what follows both cummulative (objects ending in l) or short term 
+################IMPORTANT################
+#In what follows both cummulative (objects ending in l) or short term
 # (ending in s). This convention is used throughout the code.
 
 #We have #ed the following instructions because they consume a lot of time and
@@ -364,7 +367,7 @@ todascom=function(prof,b1=bersp,b2=binter,ww=matw){
 
 
 
-#find feasible subcomunities in an object "obj" produced by todascom 
+#find feasible subcomunities in an object "obj" produced by todascom
 findfeas=function(obj) which(sapply(sapply(obj,"[[","feas"),min)>0)
 #find stable subcomunities in an object produced by todascom
 findestab=function(obj) which(sapply(obj,"[[","Ic")<0)
@@ -428,13 +431,13 @@ com28s=com28s[findfe(com28s)]
 
 
 ####################################################
-# fraction of all possible comunities with a given # 
+# fraction of all possible comunities with a given #
 #     richness that are stable and feasible        #
 #          and code for figure 3                   #
 ####################################################
 
 
-# use an object derived from todascom from which communities that are not SFC 
+# use an object derived from todascom from which communities that are not SFC
 #have been removed to calculate the fraction of SFC
 fracrich=function(obj){
 	univers=2:17
@@ -452,7 +455,7 @@ plotpyram=function(fracs,prof,lims,med=T){
 		rect(-dat[i-1]/2,i-0.5,dat[i-1]/2,i+0.5,col=1)
 	}
 	if(med==T) points(0,medgrup(dat)+1,col="white",cex=2,pch=19)
-}	
+}
 
 todpyra=function(fracs,med){
 	par(mfrow=c(1,8))
@@ -462,7 +465,7 @@ todpyra=function(fracs,med){
 	rect(-0.05,2,0.05,2.2,col=1)
 }
 
-#Create plot for long term effects; change accordingly for short term. 
+#Create plot for long term effects; change accordingly for short term.
 #Note that the final panel contains a bar that indicates scale.
 
 fracciones=matrix(nrow=16,ncol=7)
@@ -483,7 +486,7 @@ todpyra(fracciones,F)
 
 
 
-#eliminate from an object generated by todascom the subcomunities with n species 
+#eliminate from an object generated by todascom the subcomunities with n species
 #that are subsets of others with N species.
 #The use of this funtion only makes sense for the todascom object AFTER removing
 #all communities that are not stable and feasible
@@ -493,7 +496,7 @@ killsubsets=function(n,N,obj){
 	rich=sapply(sapply(obj,"[[","especies"),length)
 	whichn=obj[which(rich==n)]
 	numnini=length(whichn)
-	
+
 	while(N>n&&length(whichn)>0){
 		whichN=obj[which(rich==N)]
 		numN=length(which(rich==N))
@@ -523,7 +526,7 @@ killsubsets=function(n,N,obj){
 	else append(obj,whichn)
 }
 
-#As killsubsets, but will do for all possible n. maxim is the number of 
+#As killsubsets, but will do for all possible n. maxim is the number of
 #species of the richest stable and feasible community in the set.
 killall=function(obj,maxim){
 	for(i in 2:16){
@@ -651,7 +654,7 @@ matpa26s=creamatcompa(subcom26s)
 matpa27s=creamatcompa(subcom27s)
 matpa28s=creamatcompa(subcom28s)
 
-#use creamatcompa object "objmat" to plot changes in the "selectivity" of species for 
+#use creamatcompa object "objmat" to plot changes in the "selectivity" of species for
 #communities with different richness, and return the correlations bewteen richness
 # and selectivity. Using the slopes of the respective regression results in similar
 # results as those presented in the main text.
@@ -677,7 +680,7 @@ plotselrich=function(objmat){
 	pends
 }
 
-#check whether species that experience more positive or negative PSF occur in communities with 
+#check whether species that experience more positive or negative PSF occur in communities with
 #different richness
 #The following is for cummulative OSR, make the appropriate changes for short term effects.
 #don't forget to set matw to the respective values
@@ -921,7 +924,7 @@ graford=function(objgr){
 
 #prepare data for a multi-panel stacked area plot
 grafordb=function(objgr){
-	
+
 	dat=data.frame("id"=as.numeric(as.factor(objgr[,20])),"prof"=objgr[,19])
 	comsporprof=hist(dat$prof,breaks=3:28,plot=F)$counts
 	frec=1:dim(dat)[1]

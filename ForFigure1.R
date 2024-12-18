@@ -99,10 +99,10 @@ colu=colorRampPalette(list("orange","black"))(29)
 
 
 # Set layout
-layout(matrix(1:9, nrow = 3, byrow = FALSE), widths = c(1, 1, 1), heights = c(1.5, 1.5, 1.5))
+layout(matrix(1:12, nrow = 3, byrow = FALSE), widths = c(1, 1, 1), heights = c(1.5, 1.5, 1.5))
 
 # Adjust margins
-par(mar = c(4, 4, 0, 0), oma = c(0.25, 0.25, 0.25, 0.25))
+par(mar = c(4, 4, 0, 0), oma = c(0.2, 0.2, 0.2, 0.2))
 
 #plot stabilization
 xx8=sqrttrans(c(as.matrix(psf8[-18,-18])))
@@ -186,7 +186,7 @@ mod24=gam(yy24~s(xx24))
 xxx24=seq(min(xx24,na.rm=T),max(xx24,na.rm=T),length.out=25)
 
 plot(xx8,yy8,
-     xlab="occupancy-survival relationship",
+     xlab=NA,
      ylab="Net effect",
      xaxt="n",
      xlim=c(min(c(xx8,xx16,xx24),na.rm=T),max(c(xx8,xx16,xx24),na.rm=T)),
@@ -286,7 +286,7 @@ xxx24=seq(min(xx24,na.rm=T),max(xx24,na.rm=T),length.out=25)
 
 plot(xx8,yy8,
      xlab=NA,
-     ylab="",
+     ylab=NA,
      xaxt="n",
      xlim=c(min(c(xx8,xx16,xx24),na.rm=T),max(c(xx8,xx16,xx24),na.rm=T)),
      ylim=c(min(c(yy8,yy16,yy24),na.rm=T),max(c(yy8,yy16,yy24),na.rm=T)),
@@ -351,7 +351,7 @@ mod24=gam(yy24~s(xx24))
 xxx24=seq(min(xx24,na.rm=T),max(xx24,na.rm=T),length.out=25)
 
 plot(xx8,yy8,
-     xlab="occupancy-survival relationship",
+     xlab=NA,
      ylab=NA,
      xaxt="n",
      xlim=c(min(c(xx8,xx16,xx24),na.rm=T),max(c(xx8,xx16,xx24),na.rm=T)),
@@ -373,6 +373,8 @@ lines(xxx24,predict(mod24,data.frame(xx24=xxx24)),col=colu[24])
 ###  and their combined effect (Figure 2 in the ms)?    ###
 ###########################################################
 
+#For short term effects
+matw=matrix(1,ncol=17,nrow=17)
 
 profs=3:28
 todasprofs=pairprof(profs)
@@ -405,7 +407,7 @@ lines(profs,salee[3,],lty=1,lwd=2)
 lines(profs,salee[4,],lty=1)
 lines(profs,salee[5,],lty=2)
 
-plot(-1000,-1000,xlim=c(3,23),ylim=c(min(saldd),max(saldd)),xlab="Soil Depth (cm)",ylab=NA)
+plot(-1000,-1000,xlim=c(3,23),ylim=c(min(saldd),max(saldd)),xlab=NA,ylab=NA)
 lines(c(-100,100),c(0,0),col="gray")
 lines(profs,saldd[1,],lty=2)
 lines(profs,saldd[2,],lty=1)
@@ -414,5 +416,46 @@ lines(profs,saldd[4,],lty=1)
 lines(profs,saldd[5,],lty=2)
 
 
+#For long term effects
+matw=matrix(1,ncol=17,nrow=17)+wersp+wersp^2+wersp^3+wersp^4+wersp^5
+
+profs=3:28
+todasprofs=pairprof(profs)
+tri=upper.tri(matrix(nrow=17,ncol=17))
+salss=matrix(nrow=5,ncol=26)
+salee=salss
+saldd=salss
+for(i in 1:26){
+    ss=todasprofs$ss[,,i][tri]
+    ee=abs(todasprofs$ee[,,i][tri])
+    dd=ss-ee
+    salss[,i]=quantile(ss,c(0.1,0.25,0.5,0.75,0.9))
+    salee[,i]=quantile(ee,c(0.1,0.25,0.5,0.75,0.9))
+    saldd[,i]=quantile(dd,c(0.1,0.25,0.5,0.75,0.9))
+}
+#par(mfrow=c(3,1))
+plot(-1000,-1000,xlim=c(3,23),ylim=c(min(salss),max(salss)),xlab=NA,ylab=NA,xaxt="n")
+axis(1, at = axTicks(1), labels = FALSE)
+lines(c(-100,100),c(0,0),col="gray")
+lines(profs,salss[1,],lty=2)
+lines(profs,salss[2,],lty=1)
+lines(profs,salss[3,],lty=1,lwd=2)
+lines(profs,salss[4,],lty=1)
+lines(profs,salss[5,],lty=2)
+
+plot(-1000,-1000,xlim=c(3,23),ylim=c(0,max(salee)),xlab=NA,ylab=NA,xaxt="n")
+lines(profs,salee[1,],lty=2)
+lines(profs,salee[2,],lty=1)
+lines(profs,salee[3,],lty=1,lwd=2)
+lines(profs,salee[4,],lty=1)
+lines(profs,salee[5,],lty=2)
+
+plot(-1000,-1000,xlim=c(3,23),ylim=c(min(saldd),max(saldd)),xlab=NA,ylab=NA)
+lines(c(-100,100),c(0,0),col="gray")
+lines(profs,saldd[1,],lty=2)
+lines(profs,saldd[2,],lty=1)
+lines(profs,saldd[3,],lty=1,lwd=2)
+lines(profs,saldd[4,],lty=1)
+lines(profs,saldd[5,],lty=2)
 
 

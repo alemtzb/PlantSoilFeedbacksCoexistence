@@ -1,14 +1,14 @@
 rm(list=ls())
 library(ggplot2)
-#library(gridExtra)
+library(gridExtra)
 library(gtools)
-#library(plyr)
+library(plyr)
 library(mgcv)
-#load("~/betas supervivencia.Rdat")
-setwd("~/Desktop/GitHub/PlantSoilFeedbacksCoexistence")
+
+#this will load the required data from Martorell et al. 2021
 load("betas supervivencia.Rdat")
 load("parametros.Rdata")
-#this will load the required data from Martorell et al. 2021
+
 
 # prepare data
 b0p=rowMeans(b0)
